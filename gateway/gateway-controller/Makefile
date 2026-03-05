@@ -45,7 +45,7 @@ test: ## Run unit and integration tests
 	@echo "Running tests..."
 	@go test -v ./... -cover -coverprofile=unit-test-coverage.txt
 
-build: generate test ## Build Docker image using buildx
+build: generate ## Build Docker image using buildx
 	@echo "Building Docker image ($(IMAGE_NAME):$(VERSION))..."
 	docker buildx build -f Dockerfile \
 		--build-context sdk=../../sdk \
@@ -57,7 +57,7 @@ build: generate test ## Build Docker image using buildx
 		-t $(IMAGE_NAME):latest \
 		--load \
 		.
-
+	@echo "Docker image ($(IMAGE_NAME):$(VERSION)) built successfully."
 
 push: ## Push Docker image to registry
 	@echo "Pushing Docker images..."
