@@ -161,7 +161,7 @@ func StartPlatformAPIServer(cfg *config.Server, slogger *slog.Logger) (*Server, 
 	gatewayEventsService := service.NewGatewayEventsService(wsManager, slogger)
 	apiService := service.NewAPIService(apiRepo, projectRepo, orgRepo, gatewayRepo, devPortalRepo, publicationRepo,
 		gatewayEventsService, devPortalService, apiUtil, slogger)
-	gatewayService := service.NewGatewayService(gatewayRepo, orgRepo, apiRepo, slogger)
+	gatewayService := service.NewGatewayService(gatewayRepo, orgRepo, apiRepo, gatewayEventsService, slogger)
 	internalGatewayService := service.NewGatewayInternalAPIService(apiRepo, llmProviderRepo, llmProxyRepo, deploymentRepo, gatewayRepo, orgRepo, projectRepo, cfg, slogger)
 	apiKeyService := service.NewAPIKeyService(apiRepo, gatewayEventsService, slogger)
 	gitService := service.NewGitService()

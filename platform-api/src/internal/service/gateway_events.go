@@ -871,3 +871,55 @@ func (s *GatewayEventsService) broadcastAPIKeyUpdated(gatewayID, userId string, 
 
 	return nil
 }
+
+// BroadcastGatewayManifestRequestEvent sends a gateway manifest request event to the target gateway.
+// The correlationID (jobID) is used by the gateway controller to correlate its POST-back response.
+func (s *GatewayEventsService) BroadcastGatewayManifestRequestEvent(gatewayID string, correlationID string) error {
+	// No payload needed — the correlationID carries the job reference
+	eventDTO := dto.GatewayEventDTO{
+		Type:          "gateway.manifest.request",
+		Payload:       nil,
+		Timestamp:     time.Now().Format(time.RFC3339),
+		CorrelationID: correlationID,
+	}
+
+	eventJSON, err := json.Marshal(eventDTO)
+	if err != nil {
+		s.slogger.Error("Failed to marshal gateway manifest request event", "gatewayID", gatewayID, "correlationId", correlationID, "error", err)
+		return fmt.Errorf("failed to marshal event: %w", err)
+	}
+
+	connections := s.manager.GetConnections(gatewayID)
+	if len(connections) == 0 {
+		s.slogger.Warn("No active connections for gateway", "gatewayID", gatewayID, "correlationId", correlationID)
+		return fmt.Errorf("no active connections for gateway: %s", gatewayID)
+	}
+
+	successCount := 0
+	failureCount := 0
+	var lastError error
+
+	for _, conn := range connections {
+		if err := conn.Send(eventJSON); err != nil {
+			failureCount++
+			lastError = err
+			s.slogger.Error("Failed to send gateway manifest request event",
+				"gatewayID", gatewayID, "connectionID", conn.ConnectionID, "correlationId", correlationID, "error", err)
+			conn.DeliveryStats.IncrementFailed(fmt.Sprintf("send error: %v", err))
+		} else {
+			successCount++
+			s.slogger.Info("Gateway manifest request event sent",
+				"gatewayID", gatewayID, "connectionID", conn.ConnectionID, "correlationId", correlationID)
+			conn.DeliveryStats.IncrementTotalSent()
+			s.manager.IncrementTotalEventsSent()
+		}
+	}
+
+	s.slogger.Info("Broadcast summary", "gatewayID", gatewayID, "correlationId", correlationID, "type", "gateway.manifest.request", "total", len(connections), "success", successCount, "failed", failureCount)
+
+	if successCount == 0 {
+		return fmt.Errorf("failed to deliver event to any connection: %w", lastError)
+	}
+
+	return nil
+}
