@@ -137,7 +137,7 @@ type APIDeletedEvent struct {
 
 // APIKeyCreatedEventPayload represents the payload of an API key created event.
 type APIKeyCreatedEventPayload struct {
-	UUID          string  `json:"uuid"`           // UUID v7 from platform API for cross-system correlation
+	UUID          string  `json:"uuid"` // UUID v7 from platform API for cross-system correlation
 	ApiId         string  `json:"apiId"`
 	ApiKeyHashes  string  `json:"apiKeyHashes"`   // JSON string of hashed API key values keyed by algorithm e.g. {"sha256": "<hash>"}
 	MaskedApiKey  string  `json:"maskedApiKey"`   // Masked representation of the API key for display
@@ -148,7 +148,7 @@ type APIKeyCreatedEventPayload struct {
 		Duration int    `json:"duration,omitempty"`
 		Unit     string `json:"unit,omitempty"`
 	} `json:"expiresIn,omitempty"`
-	Issuer         *string `json:"issuer,omitempty"` // nil if not provided by the platform API
+	Issuer *string `json:"issuer,omitempty"` // nil if not provided by the platform API
 }
 
 // APIKeyCreatedEvent represents the complete API key created event
@@ -163,15 +163,15 @@ type APIKeyCreatedEvent struct {
 type APIKeyUpdatedEventPayload struct {
 	ApiId         string  `json:"apiId"`
 	KeyName       string  `json:"keyName"`
-	ApiKeyHashes  string  `json:"apiKeyHashes"`  // JSON string of hashed API key values keyed by algorithm e.g. {"sha256": "<hash>"}
-	MaskedApiKey  string  `json:"maskedApiKey"`  // Masked representation of the API key for display
-	ExternalRefId *string  `json:"externalRefId"`
+	ApiKeyHashes  string  `json:"apiKeyHashes"` // JSON string of hashed API key values keyed by algorithm e.g. {"sha256": "<hash>"}
+	MaskedApiKey  string  `json:"maskedApiKey"` // Masked representation of the API key for display
+	ExternalRefId *string `json:"externalRefId"`
 	ExpiresAt     *string `json:"expiresAt,omitempty"` // ISO 8601 format
 	ExpiresIn     *struct {
 		Duration int    `json:"duration,omitempty"`
 		Unit     string `json:"unit,omitempty"`
 	} `json:"expiresIn,omitempty"`
-	Issuer         *string `json:"issuer,omitempty"` // nil if not provided by the platform API
+	Issuer *string `json:"issuer,omitempty"` // nil if not provided by the platform API
 }
 
 // APIKeyUpdatedEvent represents the complete API key updated event
@@ -347,4 +347,12 @@ type SubscriptionPlanDeletedEvent struct {
 	Payload       SubscriptionPlanDeletedEventPayload `json:"payload"`
 	Timestamp     string                              `json:"timestamp"`
 	CorrelationID string                              `json:"correlationId"`
+}
+
+// GatewayManifestRequestEvent is sent by the control plane to request the gateway's installed policy manifest.
+// The gateway controller should respond by POSTing its policy definitions back to the control plane.
+type GatewayManifestRequestEvent struct {
+	Type          string `json:"type"`          // always "gateway.manifest.request"
+	Timestamp     string `json:"timestamp"`     // RFC3339 timestamp
+	CorrelationID string `json:"correlationId"` // for tracing
 }

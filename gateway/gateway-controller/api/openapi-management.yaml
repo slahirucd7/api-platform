@@ -2624,6 +2624,9 @@ components:
           type: object
           description: JSON Schema describing any initialization parameters for this policy. This itself is a JSON Schema document.
           additionalProperties: true
+        isCustomPolicy:
+          type: boolean
+          description: Indicates whether this policy is a user-installed custom policy. Set in policy-definition.yaml by the policy author.
 
     PolicyListResponse:
       type: object

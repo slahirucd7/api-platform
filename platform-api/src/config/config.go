@@ -66,7 +66,7 @@ type TLS struct {
 type JWT struct {
 	SecretKey      string   `envconfig:"SECRET_KEY" default:"your-secret-key-change-in-production"`
 	Issuer         string   `envconfig:"ISSUER" default:"thunder"`
-	SkipPaths      []string `envconfig:"SKIP_PATHS" default:"/health,/metrics,/api/internal/v1/ws/gateways/connect,/api/internal/v1/apis,/api/internal/v1/llm-providers,/api/internal/v1/llm-proxies,/api/internal/v1/subscription-plans,/api/internal/v1/mcp-proxies"`
+	SkipPaths      []string `envconfig:"SKIP_PATHS" default:"/health,/metrics,/api/internal/v1/ws/gateways/connect,/api/internal/v1/apis,/api/internal/v1/llm-providers,/api/internal/v1/llm-proxies,/api/internal/v1/subscription-plans,/api/internal/v1/mcp-proxies,/api/internal/v1/gateways"`
 	SkipValidation bool     `envconfig:"SKIP_VALIDATION" default:"true"` // Skip signature validation for development
 }
 
@@ -129,7 +129,9 @@ type DefaultDevPortal struct {
 
 // Deployments holds deployment-specific configuration
 type Deployments struct {
-	MaxPerAPIGateway int `envconfig:"MAX_PER_API_GATEWAY" default:"20"`
+	MaxPerAPIGateway        int `envconfig:"MAX_PER_API_GATEWAY" default:"20"`
+	ManifestSyncTimeoutSecs int `envconfig:"MANIFEST_SYNC_TIMEOUT_SECS" default:"30"`   // seconds; pending → failed if exceeded
+	ManifestReadyTTLSecs    int `envconfig:"MANIFEST_READY_TTL_SECS" default:"60"`  // seconds; ready → re-trigger if exceeded
 }
 
 // APIKey holds API key-specific configuration
