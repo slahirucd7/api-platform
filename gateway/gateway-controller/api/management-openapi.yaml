@@ -3074,6 +3074,11 @@ components:
             environment: production
             team: backend
             version: v1
+        cpSyncEnabled:
+          type: boolean
+          description: Enable synchronization of this API to the control plane (APIM)
+          example: false
+          default: false
 
     APIConfigData:
       type: object
